@@ -13,6 +13,8 @@ type Result[T any] interface {
 
 	IfOk(do func(T)) Result[T]
 	OnErr(do func(error)) Result[T]
+
+	Fold(ifok func(T), onerr func(error)) Result[T]
 }
 
 type ok[T any] struct {
@@ -25,37 +27,42 @@ func Ok[T any](val T) Result[T] {
 	result.val = val
 	return *result
 }
-func (s ok[T]) IsOk() bool {
+func (o ok[T]) IsOk() bool {
 	return true
 }
 
-func (s ok[T]) IsFail() bool {
+func (o ok[T]) IsFail() bool {
 	return false
 }
 
-func (s ok[T]) ValOrElse(defaultVal T) T {
-	return s.val
+func (o ok[T]) ValOrElse(defaultVal T) T {
+	return o.val
 }
 
-func (s ok[T]) PtrOrNil() *T {
-	return &s.val
+func (o ok[T]) PtrOrNil() *T {
+	return &o.val
 }
 
-func (s ok[T]) Then(f func() Result[T]) Result[T] {
+func (o ok[T]) Then(f func() Result[T]) Result[T] {
 	return f()
 }
 
-func (s ok[T]) ErrorOrNil() error {
+func (o ok[T]) ErrorOrNil() error {
 	return nil
 }
 
-func (s ok[T]) IfOk(do func(T)) Result[T] {
-	do(s.val)
-	return s
+func (o ok[T]) IfOk(do func(T)) Result[T] {
+	do(o.val)
+	return o
 }
 
-func (s ok[T]) OnErr(_ func(error)) Result[T] {
-	return s
+func (o ok[T]) OnErr(_ func(error)) Result[T] {
+	return o
+}
+
+func (o ok[T]) Fold(do func(T), _ func(error)) Result[T] {
+	do(o.val)
+	return o
 }
 
 type fail[T any] struct {
@@ -97,6 +104,11 @@ func (f fail[T]) IfOk(_ func(T)) Result[T] {
 }
 
 func (f fail[T]) OnErr(do func(error)) Result[T] {
+	do(f.err)
+	return f
+}
+
+func (f fail[T]) Fold(_ func(T), do func(error)) Result[T] {
 	do(f.err)
 	return f
 }
@@ -163,6 +175,3 @@ func Wrap3[A, B, C, T any](f func(A, B, C) (T, error)) func(A, B, C) Result[T] {
 		}
 	}
 }
-
-/*
- */

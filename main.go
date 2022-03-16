@@ -54,12 +54,51 @@ func ResultTest() {
 
 	if result.IsFail() {
 		fmt.Println(result.ErrorOrNil())
+		fmt.Println(result.ValOrElse(-1))
 	} else {
-		fmt.Println(result.ValOrElse(01))
+		fmt.Println(result.ValOrElse(-1))
 	}
 }
 
+type SomeResource struct {
+	DatabaseId int
+}
+
+func GetSomeResource(id int) (*SomeResource, error) {
+	if id == 1 {
+		return &SomeResource{810975}, nil
+	} else {
+		return nil, errors.New("Resource not found")
+	}
+}
+func GiveMeASafeFunc() {
+}
+func IfOkTest() {
+	safeLogic := func(id int) {
+		Wrap1(GetSomeResource)(id).
+			IfOk(func(s *SomeResource) { fmt.Println(s.DatabaseId) }).
+			OnErr(func(e error) { fmt.Println(e) })
+	}
+	safeLogic(1)
+	safeLogic(2)
+}
+func FoldTest() {
+	safeLogic := func(id int) Result[*SomeResource] {
+		return Wrap1(GetSomeResource)(id).
+			Fold(func(s *SomeResource) {},
+				func(e error) { fmt.Println(e) })
+	}
+	safeLogic(1).
+		IfOk(func(s *SomeResource) { s.DatabaseId = 9999 }).
+		IfOk(func(s *SomeResource) { fmt.Println(s.DatabaseId) })
+
+	safeLogic(2).
+		IfOk(func(s *SomeResource) { s.DatabaseId = 2132173 }).
+		IfOk(func(s *SomeResource) { fmt.Println(s.DatabaseId) })
+}
 func main() {
-	TraditionTest()
-	ResultTest()
+	//TraditionTest()
+	//ResultTest()
+	//IfOkTest()
+	FoldTest()
 }
