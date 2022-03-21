@@ -1,8 +1,9 @@
-package main
+package result
 
 import (
 	"errors"
 	"fmt"
+	"testing"
 )
 
 type MyWriter struct {
@@ -27,7 +28,7 @@ func (m *MyWriter) TraditionWrite(a string) (int, error) {
 	fmt.Println(a)
 	return len(a), nil
 }
-func TraditionTest() {
+func TraditionTest(t *testing.T) {
 	count = 0
 	w := MyWriter{}
 	wrap := Wrap1(w.TraditionWrite)
@@ -42,7 +43,7 @@ func TraditionTest() {
 		fmt.Println(result.ValOrElse(01))
 	}
 }
-func ResultTest() {
+func ResultTest(t *testing.T) {
 	count = 0
 	w := MyWriter{}
 	result := w.Write("Write 1").
@@ -73,7 +74,7 @@ func GetSomeResource(id int) (*SomeResource, error) {
 }
 func GiveMeASafeFunc() {
 }
-func IfOkTest() {
+func IfOkTest(t testing.T) {
 	safeLogic := func(id int) {
 		Wrap1(GetSomeResource)(id).
 			IfOk(func(s *SomeResource) { fmt.Println(s.DatabaseId) }).
@@ -82,7 +83,7 @@ func IfOkTest() {
 	safeLogic(1)
 	safeLogic(2)
 }
-func FoldTest() {
+func FoldTest(t *testing.T) {
 	safeLogic := func(id int) Result[*SomeResource] {
 		return Wrap1(GetSomeResource)(id).
 			Fold(func(s *SomeResource) {},
@@ -95,10 +96,4 @@ func FoldTest() {
 	safeLogic(2).
 		IfOk(func(s *SomeResource) { s.DatabaseId = 2132173 }).
 		IfOk(func(s *SomeResource) { fmt.Println(s.DatabaseId) })
-}
-func main() {
-	//TraditionTest()
-	//ResultTest()
-	//IfOkTest()
-	FoldTest()
 }

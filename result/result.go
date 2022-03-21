@@ -1,4 +1,4 @@
-package main
+package result
 
 type Result[T any] interface {
 	IsOk() bool
@@ -46,6 +46,10 @@ func (o ok[T]) PtrOrNil() *T {
 func (o ok[T]) Then(f func() Result[T]) Result[T] {
 	return f()
 }
+
+//func (o ok[T]) Then[B any](f func(T) Result[B]) Result[B] {
+//return f(o)
+//}
 
 func (o ok[T]) ErrorOrNil() error {
 	return nil
