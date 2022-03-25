@@ -41,8 +41,8 @@ func abs(x int) int {
 
 func safe(k int, positions []int) bool {
 	for i, p := range positions {
-		//if p == k || p+i == k+len(positions) || p-i == k-len(positions) {
-		if p == k || abs(p-k) == i+1 {
+		if p == k || p+i == k+len(positions) || p-i == k-len(positions) {
+			//if p == k || abs(p-k) == i+1 {
 			return false
 		}
 	}
@@ -66,8 +66,12 @@ func positions(k, n int) [][]int {
 	}
 	conf := positions(k-1, n)
 	return ConcatMap(func(p int) [][]int {
-		//return Map(func(ps []int) []int { return append(ps, p) },
-		return Map(func(ps []int) []int { return append([]int{p}, ps...) },
+		return Map(func(ps []int) []int {
+			tmp := make([]int, len(ps))
+			copy(tmp, ps)
+			return append(tmp, p)
+		},
+			//return Map(func(ps []int) []int { return append([]int{p}, ps...) },
 			Filter(func(ps []int) bool { return safe(p, ps) }, conf))
 	}, sequence(1, n))
 }
@@ -78,7 +82,7 @@ func Queen(boardSize int) [][]int {
 
 func TestQueen(t *testing.T) {
 	begin := time.Now()
-	//ForEach(func(l []int) { fmt.Println(l) }, Queen(8))
+	ForEach(func(l []int) { fmt.Println(l) }, Queen(8))
 	fmt.Println(len(Queen(8)))
 	fmt.Println(time.Since(begin))
 }

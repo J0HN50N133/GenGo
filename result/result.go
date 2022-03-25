@@ -27,6 +27,7 @@ func Ok[T any](val T) Result[T] {
 	result.val = val
 	return *result
 }
+
 func (o ok[T]) IsOk() bool {
 	return true
 }
@@ -77,6 +78,7 @@ type fail[T any] struct {
 func (f fail[T]) IsOk() bool {
 	return false
 }
+
 func Fail[T any](err error) Result[T] {
 	fail := new(fail[T])
 	fail.err = err
@@ -120,7 +122,7 @@ func (f fail[T]) Fold(_ func(T), do func(error)) Result[T] {
 func Fmap[A, B any](f func(a A) B, r Result[A]) Result[B] {
 	if r.IsOk() {
 		// not elegant
-		return Ok[B](f(r.(ok[A]).val))
+		return Ok(f(r.(ok[A]).val))
 	} else {
 		return Fail[B](r.ErrorOrNil())
 	}
