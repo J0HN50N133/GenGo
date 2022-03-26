@@ -6,8 +6,7 @@ import (
 	"testing"
 )
 
-type MyWriter struct {
-}
+type MyWriter struct{}
 
 var count = 0
 
@@ -28,6 +27,7 @@ func (m *MyWriter) TraditionWrite(a string) (int, error) {
 	fmt.Println(a)
 	return len(a), nil
 }
+
 func TraditionTest(t *testing.T) {
 	count = 0
 	w := MyWriter{}
@@ -40,9 +40,10 @@ func TraditionTest(t *testing.T) {
 	if result.IsFail() {
 		fmt.Println(result.ErrorOrNil())
 	} else {
-		fmt.Println(result.ValOrElse(01))
+		fmt.Println(result.ValOrElse(0o1))
 	}
 }
+
 func ResultTest(t *testing.T) {
 	count = 0
 	w := MyWriter{}
@@ -72,17 +73,20 @@ func GetSomeResource(id int) (*SomeResource, error) {
 		return nil, errors.New("Resource not found")
 	}
 }
+
 func GiveMeASafeFunc() {
 }
+
 func IfOkTest(t testing.T) {
 	safeLogic := func(id int) {
 		Wrap1(GetSomeResource)(id).
 			IfOk(func(s *SomeResource) { fmt.Println(s.DatabaseId) }).
-			OnErr(func(e error) { fmt.Println(e) })
+			IfFail(func(e error) { fmt.Println(e) })
 	}
 	safeLogic(1)
 	safeLogic(2)
 }
+
 func FoldTest(t *testing.T) {
 	safeLogic := func(id int) Result[*SomeResource] {
 		return Wrap1(GetSomeResource)(id).

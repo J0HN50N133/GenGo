@@ -12,7 +12,7 @@ type Result[T any] interface {
 	ErrorOrNil() error
 
 	IfOk(do func(T)) Result[T]
-	OnErr(do func(error)) Result[T]
+	IfFail(do func(error)) Result[T]
 
 	Fold(ifok func(T), onerr func(error)) Result[T]
 }
@@ -61,7 +61,7 @@ func (o ok[T]) IfOk(do func(T)) Result[T] {
 	return o
 }
 
-func (o ok[T]) OnErr(_ func(error)) Result[T] {
+func (o ok[T]) IfFail(_ func(error)) Result[T] {
 	return o
 }
 
@@ -109,7 +109,7 @@ func (f fail[T]) IfOk(_ func(T)) Result[T] {
 	return f
 }
 
-func (f fail[T]) OnErr(do func(error)) Result[T] {
+func (f fail[T]) IfFail(do func(error)) Result[T] {
 	do(f.err)
 	return f
 }
