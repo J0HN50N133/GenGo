@@ -3,7 +3,7 @@ package iterator
 import (
 	"errors"
 
-	"github.com/johnsonlee-debug.com/GenGo/result"
+	. "github.com/johnsonlee-debug.com/GenGo/result"
 )
 
 type Iterable[T any] interface {
@@ -13,8 +13,8 @@ type Iterable[T any] interface {
 
 type Iterator[E any] interface {
 	HasNext() bool
-	Next() result.Result[E]
-	Remove() result.Result[result.Unit]
+	Next() Result[E]
+	Remove() Result[Unit]
 }
 
 func noSuchElementException() error {
@@ -34,12 +34,12 @@ func (m *mapIterator[A, B]) HasNext() bool {
 	return m.it.HasNext()
 }
 
-func (m *mapIterator[A, B]) Next() result.Result[B] {
-	return result.Fmap(m.transform, m.it.Next())
+func (m *mapIterator[A, B]) Next() Result[B] {
+	return Fmap(m.transform, m.it.Next())
 }
 
-func (m *mapIterator[A, B]) Remove() result.Result[result.Unit] {
-	return result.Fail[result.Unit](unSupportedOperationException())
+func (m *mapIterator[A, B]) Remove() Result[Unit] {
+	return Fail[Unit](unSupportedOperationException())
 }
 
 func ForEach[A any](f func(A), it Iterator[A]) {
@@ -61,19 +61,19 @@ func (f *filterIterator[A]) HasNext() bool {
 	return f.it.HasNext()
 }
 
-func (f *filterIterator[A]) Next() result.Result[A] {
+func (f *filterIterator[A]) Next() Result[A] {
 	for f.it.HasNext() {
 		next := f.it.Next()
-		ok := result.Fmap(f.filter, next).ValOrElse(false)
+		ok := Fmap(f.filter, next).ValOrElse(false)
 		if ok {
 			return next
 		}
 	}
-	return result.Fail[A](noSuchElementException())
+	return Fail[A](noSuchElementException())
 }
 
-func (f *filterIterator[A]) Remove() result.Result[result.Unit] {
-	return result.Fail[result.Unit](unSupportedOperationException())
+func (f *filterIterator[A]) Remove() Result[Unit] {
+	return Fail[Unit](unSupportedOperationException())
 }
 
 func Filter[A any](f func(A) bool, it Iterator[A]) Iterator[A] {

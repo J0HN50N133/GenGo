@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/johnsonlee-debug.com/GenGo/iterator"
-	"github.com/johnsonlee-debug.com/GenGo/result"
+	. "github.com/johnsonlee-debug.com/GenGo/result"
 )
 
 type node[Item any] struct {
@@ -39,15 +39,15 @@ func (i *innerIterator[Item]) HasNext() bool {
 	return i.position != &i.position.deque.dummy
 }
 
-func (i *innerIterator[Item]) Next() result.Result[Item] {
+func (i *innerIterator[Item]) Next() Result[Item] {
 	if !i.HasNext() {
-		return result.Fail[Item](noSuchElementException())
+		return Fail[Item](noSuchElementException())
 	}
 	i.position = i.position.next
-	return result.Ok(*i.position.prev.val)
+	return Ok(*i.position.prev.val)
 }
 
-func (i *innerIterator[Item]) Remove() result.Result[result.Unit] {
+func (i *innerIterator[Item]) Remove() Result[Unit] {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -116,16 +116,16 @@ func (d *Deque[Item]) remove(e *node[Item]) Item {
 	return *e.val
 }
 
-func (d *Deque[Item]) PopFront() result.Result[Item] {
+func (d *Deque[Item]) PopFront() Result[Item] {
 	if d.IsEmpty() {
-		return result.Fail[Item](errors.New("NoSuchElementException"))
+		return Fail[Item](errors.New("NoSuchElementException"))
 	}
-	return result.Ok(d.remove(d.dummy.next))
+	return Ok(d.remove(d.dummy.next))
 }
 
-func (d *Deque[Item]) PopBack() result.Result[Item] {
+func (d *Deque[Item]) PopBack() Result[Item] {
 	if d.IsEmpty() {
-		return result.Fail[Item](errors.New("NoSuchElementException"))
+		return Fail[Item](errors.New("NoSuchElementException"))
 	}
-	return result.Ok(d.remove(d.dummy.prev))
+	return Ok(d.remove(d.dummy.prev))
 }
